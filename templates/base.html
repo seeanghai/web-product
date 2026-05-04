@@ -1,122 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Premium Shop{% endblock %}</title>
-    
-    <!-- Google Fonts -->
+    <title>{% block title %}STELLAR{% endblock %}</title>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Bootstrap CSS -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
     <style>
+        /* ─── RESET & ROOT ─────────────────────────────────────────── */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         :root {
-            --primary-color: #6366f1;
-            --secondary-color: #a855f7;
-            --dark-bg: #0f172a;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --bg: #0f172a;
             --card-bg: #1e293b;
-            --text-main: #ffffff;
-            --text-muted: rgba(255, 255, 255, 0.7);
+            --glass: rgba(255, 255, 255, 0.04);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --r-md: 16px;
+            --r-lg: 24px;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--dark-bg);
-            color: var(--text-main);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            display: flex;
+            flex-direction: column;
         }
 
+        /* ─── REVEAL ───────────────────────────────────────── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .reveal.visible {
+            opacity: 1 !important;
+            transform: none !important;
+        }
+
+        /* ─── NAVBAR ────────────────────────────────────────────────── */
         .navbar {
-            background-color: rgba(15, 23, 42, 0.8) !important;
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            height: 64px;
+            background: rgba(8, 12, 20, 0.85) !important;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border) !important;
+            padding: 0 24px;
         }
 
         .navbar-brand {
-            font-weight: 700;
-            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 1.5rem;
+            font-size: 1.25rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            color: var(--text) !important;
         }
 
         .nav-link {
             color: var(--text-muted) !important;
-            transition: color 0.3s;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
         }
 
-        .nav-link:hover, .nav-link.active {
-            color: var(--text-main) !important;
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--text) !important;
         }
 
-        .btn-premium {
-            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
-            border: none;
-            color: white;
-            padding: 0.6rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: transform 0.3s, box-shadow 0.3s;
+        /* cart icon */
+        .cart-icon-wrap {
+            position: relative;
+            padding: 8px;
+            color: var(--text);
+            font-size: 1.2rem;
+            transition: opacity 0.2s;
         }
 
-        .btn-premium:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
-            color: white;
-        }
-
-        footer {
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 3rem 0;
-            margin-top: 5rem;
-            color: #ffffff;
-        }
-
-        footer .text-muted {
-            color: rgba(255, 255, 255, 0.7) !important;
-        }
-
-        footer a {
-            color: #ffffff !important;
-            transition: opacity 0.3s;
-        }
-
-        footer a:hover {
+        .cart-icon-wrap:hover {
             opacity: 0.7;
         }
 
-        footer .navbar-brand {
-            -webkit-text-fill-color: #ffffff !important;
-            background: none !important;
-        }
-
-        .card-product {
-            background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            overflow: hidden;
-            transition: transform 0.3s, border-color 0.3s;
-            height: 100%;
-        }
-
-        .card-product:hover {
-            transform: translateY(-10px);
-            border-color: var(--primary-color);
-        }
-
-        .product-image-container {
-            height: 250px;
-            background: white;
+        .cart-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            min-width: 18px;
+            height: 18px;
+            background: var(--primary);
+            border-radius: 50%;
+            font-size: 0.65rem;
+            font-weight: 700;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 1.5rem;
+            color: #fff;
+        }
+
+        /* checkout button */
+        .btn-premium {
+            padding: 8px 20px;
+            border-radius: 8px;
+            background: var(--primary);
+            border: none !important;
+            color: #fff !important;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .btn-premium:hover {
+            background: var(--primary-hover);
+        }
+
+        /* ─── PRODUCT CARDS ────────────────────────────────── */
+        .card-product {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border) !important;
+            border-radius: var(--r-md) !important;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            height: 100%;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .card-product:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.4);
+            border-color: var(--primary) !important;
+        }
+
+        .product-image-container {
+            height: 260px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
         }
 
         .product-image {
@@ -126,389 +169,268 @@
         }
 
         .product-price {
-            font-size: 1.25rem;
+            font-size: 1.2rem;
             font-weight: 700;
-            color: var(--primary-color);
+            color: var(--primary);
         }
 
         .product-description {
-            color: rgba(255, 255, 255, 0.9) !important;
+            color: var(--text-muted) !important;
+            font-size: 0.85rem;
+            line-height: 1.5;
         }
 
-        /* Global non-black text rule */
-        * {
-            color: var(--text-main);
+        /* ─── FORMS ─────────────────────────────────────────────────── */
+        .form-control,
+        .form-select {
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid var(--glass-border) !important;
+            border-radius: 8px !important;
+            color: var(--text) !important;
+            padding: 12px 16px;
         }
 
-        .btn-light {
-            background-color: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white !important;
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.3) !important;
         }
 
-        .btn-light:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-            color: white !important;
-        }
-
-        input, textarea, select {
-            color: white !important;
-        }
-
-        input::placeholder {
-            color: rgba(255, 255, 255, 0.5) !important;
-        }
-
-        /* Animations */
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes scaleIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        @keyframes cartPop {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.4); color: var(--primary-color); }
-            100% { transform: scale(1); }
-        }
-
-        .reveal {
-            opacity: 0;
-            transition: all 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
-        }
-
-        .reveal.active {
-            opacity: 1;
-            transform: none !important;
-        }
-
-        .reveal-fade-up { transform: translateY(40px); }
-        .reveal-fade-in { transform: none; }
-        .reveal-scale-in { transform: scale(0.9); }
-
-        .cart-animate {
-            animation: cartPop 0.4s ease-out;
-        }
-
-        .stagger-1 { transition-delay: 0.1s; }
-        .stagger-2 { transition-delay: 0.2s; }
-        .stagger-3 { transition-delay: 0.3s; }
-        .stagger-4 { transition-delay: 0.4s; }
-
-        /* Strong Animations */
-        .bg-glow {
-            position: fixed;
-            top: 0;
-            left: 0;
+        /* ─── ADD TO CART BUTTON ────────────────────────────────────── */
+        .btn-add-cart {
             width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.1), transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(168, 85, 247, 0.1), transparent 40%);
-            filter: blur(100px);
-            z-index: -1;
-            animation: moveGlow 20s infinite alternate;
+            height: 44px;
+            border-radius: 8px;
+            background: var(--primary);
+            border: none;
+            color: #fff;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: background 0.2s;
         }
 
-        @keyframes moveGlow {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(100px, 50px); }
+        .btn-add-cart:hover {
+            background: var(--primary-hover);
         }
 
-        .custom-cursor {
-            width: 20px;
-            height: 20px;
-            background: var(--primary-color);
-            border-radius: 50%;
+        .btn-add-cart.added {
+            background: #10b981;
+        }
+
+        /* ─── TOAST ─────────────────────────────────────────────────── */
+        #stellar-toast {
             position: fixed;
-            pointer-events: none;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-size: 0.9rem;
+            font-weight: 500;
             z-index: 9999;
-            mix-blend-mode: difference;
-            transition: transform 0.1s ease-out;
             opacity: 0;
-        }
-
-        .cursor-trail {
-            width: 40px;
-            height: 40px;
-            border: 1px solid var(--primary-color);
-            border-radius: 50%;
-            position: fixed;
+            transition: opacity 0.3s;
             pointer-events: none;
-            z-index: 9998;
-            transition: all 0.2s ease-out;
-            opacity: 0;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
         }
 
-        #loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--dark-bg);
-            z-index: 10000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.5s ease-out, visibility 0.5s;
+        #stellar-toast.show {
+            opacity: 1;
         }
 
-        .loader-content {
-            width: 50px;
-            height: 50px;
-            border: 3px solid var(--primary-color);
-            border-top-color: transparent;
+        .toast-dot {
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-        /* Tilt Effect */
-        .tilt-card {
-            transition: transform 0.1s ease-out;
-            transform-style: preserve-3d;
-        }
-
-        .tilt-card > * {
-            transform: translateZ(20px);
-        }
-
-        /* Text Reveal */
-        .text-reveal {
+            background: #10b981;
             display: inline-block;
-            overflow: hidden;
-            vertical-align: bottom;
+            margin-right: 10px;
         }
 
-        .text-reveal-content {
-            display: inline-block;
-            transform: translateY(100%);
-            animation: revealUp 1s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+        /* ─── FOOTER ────────────────────────────────────────────────── */
+        footer {
+            background: #0f172a;
+            border-top: 1px solid var(--glass-border);
+            padding: 60px 0 40px;
+            margin-top: auto;
         }
 
-        @keyframes revealUp {
-            to { transform: translateY(0); }
+        footer .footer-brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            color: var(--text);
         }
 
-        /* Fade Out for Navigation */
-        .fade-out {
-            opacity: 0 !important;
-            transform: translateY(-20px) !important;
-            transition: all 0.4s ease-in !important;
+        footer p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .social-btn {
+            color: var(--text-muted);
+            font-size: 1.25rem;
+            margin: 0 10px;
+            transition: color 0.2s;
+        }
+
+        .social-btn:hover {
+            color: var(--text);
+        }
+
+        /* ─── GLOBAL ──────────────────────────────────────── */
+        * {
+            color: var(--text);
+        }
+
+        main {
+            flex: 1;
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 0 16px;
+            }
+
+            footer {
+                padding: 40px 16px 28px;
+            }
         }
     </style>
+
     {% block extra_css %}{% endblock %}
 </head>
-<body class="d-flex flex-column min-vh-100">
-<div id="loader"><div class="loader-content"></div></div>
-<div class="bg-glow"></div>
-<div class="custom-cursor"></div>
-<div class="cursor-trail"></div>
 
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark sticky-top">
-    <div class="container">
-        <a class="navbar-brand" href="/">STELLAR</a>
-        <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarContent">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarContent">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item"><a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">Home</a></li>
-                <li class="nav-item"><a class="nav-link {% if request.path == '/product' %}active{% endif %}" href="/product">Shop</a></li>
-            </ul>
-            <div class="d-flex align-items-center">
-                <a href="/cart" class="nav-link me-3 position-relative">
-                    <i class="bi bi-cart3 fs-4"></i>
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cart-count">
-                        0
-                    </span>
-                </a>
-                <a href="/checkout" class="btn btn-premium">Checkout</a>
+<body>
+
+    <!-- Toast -->
+    <div id="stellar-toast">
+        <div class="toast-dot"></div>
+        <span id="toast-msg">Added to cart</span>
+    </div>
+
+    <!-- ── NAVBAR ─────────────────────────────────────────────── -->
+    <nav class="navbar navbar-expand-lg navbar-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">STELLAR</a>
+
+            <button class="navbar-toggler border-0" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                style="background:rgba(255,255,255,0.07);border-radius:10px;padding:6px 10px;">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/' %}active{% endif %}" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == '/product' %}active{% endif %}"
+                            href="/product">Shop</a>
+                    </li>
+                </ul>
+
+                <div class="d-flex align-items-center gap-2">
+                    <a href="/cart" class="cart-icon-wrap" id="cart-link">
+                        <i class="bi bi-bag"></i>
+                        <span class="cart-badge" id="cart-count">0</span>
+                    </a>
+                    <a href="/checkout" class="btn-premium">Checkout</a>
+                </div>
             </div>
         </div>
-    </div>
-</nav>
+    </nav>
 
-<main>
-    {% block content %}{% endblock %}
-</main>
+    <!-- ── MAIN CONTENT ──────────────────────────────────────── -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
 
-<!-- Footer -->
-<footer>
-    <div class="container text-center">
-        <h3 class="navbar-brand mb-4 d-inline-block">STELLAR</h3>
-        <p class="text-muted">Discover the finest collection of premium products curated just for you.</p>
-        <div class="mt-4">
-            <a href="#" class="text-muted mx-2 fs-4"><i class="bi bi-facebook"></i></a>
-            <a href="#" class="text-muted mx-2 fs-4"><i class="bi bi-instagram"></i></a>
-            <a href="#" class="text-muted mx-2 fs-4"><i class="bi bi-twitter-x"></i></a>
+    <!-- ── FOOTER ─────────────────────────────────────────────── -->
+    <footer>
+        <div class="container text-center">
+            <div class="footer-brand">STELLAR</div>
+            <p class="mb-4">Discover the finest collection of premium products curated just for you.</p>
+            <div class="d-flex justify-content-center gap-2 mb-4">
+                <a href="#" class="social-btn"><i class="bi bi-instagram"></i></a>
+                <a href="#" class="social-btn"><i class="bi bi-twitter-x"></i></a>
+                <a href="#" class="social-btn"><i class="bi bi-facebook"></i></a>
+                <a href="#" class="social-btn"><i class="bi bi-pinterest"></i></a>
+            </div>
+            <p class="copy mb-0">© 2026 Stellar Shop. Built with Elegance.</p>
         </div>
-        <p class="text-muted mt-5 mb-0">&copy; 2026 Stellar Shop. Built with Elegance.</p>
-    </div>
-</footer>
+    </footer>
 
-<!-- Bootstrap JS -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<script>
-    function updateCartUI() {
-        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        const count = cart.reduce((acc, item) => acc + item.quantity, 0);
-        document.getElementById('cart-count').textContent = count;
-    }
-
-    function addToCart(id, title, price, image, btn) {
-        let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        const idNum = parseInt(id);
-        const priceNum = parseFloat(price);
-        const existing = cart.find(item => item.id === idNum);
-        
-        if (existing) {
-            existing.quantity += 1;
-        } else {
-            cart.push({ id: idNum, title, price: priceNum, image, quantity: 1 });
+    <script>
+        /* ── CART ─────────────────────────────────────────────────── */
+        function updateCartUI() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const count = cart.reduce((acc, item) => acc + item.quantity, 0);
+            document.getElementById('cart-count').textContent = count;
         }
-        
-        localStorage.setItem('cart', JSON.stringify(cart));
-        updateCartUI();
-        
-        // Visual feedback
-        if (btn) {
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="bi bi-check-lg"></i> Added';
-            btn.classList.add('btn-success');
-            setTimeout(() => {
-                btn.innerHTML = originalText;
-                btn.classList.remove('btn-success');
-            }, 2000);
-        }
-    }
 
-    document.addEventListener('DOMContentLoaded', () => {
-        updateCartUI();
-        
-        // Event delegation for all "Add to Cart" buttons
-        document.body.addEventListener('click', (e) => {
+        function addToCart(id, title, price, image, btn) {
+            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const existing = cart.find(item => String(item.id) == String(id));
+            if (existing) {
+                existing.quantity += 1;
+            } else {
+                cart.push({ id: String(id), title, price: parseFloat(price), image, quantity: 1 });
+            }
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartUI();
+
+            if (btn) {
+                const orig = btn.innerHTML;
+                btn.innerHTML = '<i class="bi bi-check-lg"></i> Added';
+                btn.classList.add('added');
+                setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('added'); }, 2000);
+            }
+
+            showToast('Added — ' + title);
+        }
+
+        /* ── TOAST ────────────────────────────────────────────────── */
+        function showToast(msg) {
+            const t = document.getElementById('stellar-toast');
+            document.getElementById('toast-msg').textContent = msg;
+            t.classList.add('show');
+            clearTimeout(t._timer);
+            t._timer = setTimeout(() => t.classList.remove('show'), 2800);
+        }
+
+        /* ── EVENT DELEGATION (add-to-cart) ───────────────────────── */
+        document.body.addEventListener('click', e => {
             const btn = e.target.closest('.add-to-cart-btn');
             if (btn) {
                 const d = btn.dataset;
                 addToCart(d.id, d.title, d.price, d.image, btn);
-                
-                // Animate cart icon
-                const cartIcon = document.querySelector('.bi-cart3').parentElement;
-                cartIcon.classList.remove('cart-animate');
-                void cartIcon.offsetWidth; // Trigger reflow
-                cartIcon.classList.add('cart-animate');
             }
         });
 
-        // Intersection Observer for Reveal Animations
-        const observerOptions = {
-            threshold: 0.15,
-            rootMargin: '0px 0px -50px 0px'
-        };
+        /* ── INIT ─────────────────────────────────────────────────── */
+        function initReveal() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, { threshold: 0.1 });
 
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('active');
-                }
-            });
-        }, observerOptions);
+            document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+        }
 
-        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-        // 3D Tilt Logic
-        document.body.addEventListener('mousemove', (e) => {
-            const card = e.target.closest('.card-product:not(.no-tilt)');
-            if (card) {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                const rotateX = (y - centerY) / 10;
-                const rotateY = (centerX - x) / 10;
-                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
-            }
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCartUI();
+            initReveal();
         });
+    </script>
 
-        document.body.addEventListener('mouseleave', (e) => {
-            const card = e.target.closest('.card-product');
-            if (card) {
-                card.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
-            }
-        }, true);
-
-        // Page Transition on Link Click
-        document.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', (e) => {
-                const href = link.getAttribute('href');
-                if (href && href.startsWith('/') && !href.includes('#')) {
-                    e.preventDefault();
-                    document.querySelector('main').classList.add('fade-out');
-                    setTimeout(() => {
-                        window.location.href = href;
-                    }, 400);
-                }
-            });
-        });
-
-        // Loader
-        window.addEventListener('load', () => {
-            const loader = document.getElementById('loader');
-            loader.style.opacity = '0';
-            loader.style.visibility = 'hidden';
-            setTimeout(() => loader.remove(), 500);
-        });
-
-        // Custom Cursor
-        const cursor = document.querySelector('.custom-cursor');
-        const trail = document.querySelector('.cursor-trail');
-        
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.opacity = '1';
-            trail.style.opacity = '1';
-            cursor.style.left = e.clientX - 10 + 'px';
-            cursor.style.top = e.clientY - 10 + 'px';
-            setTimeout(() => {
-                trail.style.left = e.clientX - 20 + 'px';
-                trail.style.top = e.clientY - 20 + 'px';
-            }, 50);
-        });
-
-        // Magnetic Buttons & Hover Effects
-        document.body.addEventListener('mouseenter', (e) => {
-            if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON' || e.target.classList.contains('add-to-cart-btn')) {
-                cursor.style.transform = 'scale(2)';
-                trail.style.transform = 'scale(1.5)';
-                trail.style.background = 'rgba(99, 102, 241, 0.2)';
-            }
-        }, true);
-
-        document.body.addEventListener('mouseleave', (e) => {
-            if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON' || e.target.classList.contains('add-to-cart-btn')) {
-                cursor.style.transform = 'scale(1)';
-                trail.style.transform = 'scale(1)';
-                trail.style.background = 'transparent';
-            }
-        }, true);
-    });
-</script>
-
-{% block extra_js %}{% endblock %}
-
+    {% block extra_js %}{% endblock %}
 </body>
+
 </html>

@@ -5,9 +5,9 @@
 {% block extra_css %}
 <style>
 .hero-section {
-    padding: 100px 0;
-    background: radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent),
-                radial-gradient(circle at bottom left, rgba(168, 85, 247, 0.15), transparent);
+    padding: 120px 0;
+    background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.1), transparent),
+                radial-gradient(circle at bottom left, rgba(59, 130, 246, 0.05), transparent);
 }
 
 .hero-title {
@@ -18,24 +18,24 @@
 }
 
 .hero-subtitle {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     color: var(--text-muted);
     margin-bottom: 2.5rem;
     max-width: 600px;
 }
 
 .section-title {
-    font-weight: 700;
+    font-weight: 800;
     margin-bottom: 3rem;
     text-align: center;
 }
 
 .category-badge {
     text-transform: uppercase;
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-size: 0.7rem;
+    font-weight: 700;
     letter-spacing: 1px;
-    color: var(--primary-color);
+    color: var(--primary);
     margin-bottom: 0.5rem;
     display: block;
 }
@@ -103,15 +103,13 @@
 
 <section class="py-5 my-5">
     <div class="container">
-        <div class="bg-primary bg-gradient rounded-5 p-5 text-center position-relative overflow-hidden no-tilt">
-            <div class="position-relative z-1">
-                <h2 class="fw-bold mb-3">Get 20% Off Your First Order</h2>
-                <p class="mb-4">Subscribe to our newsletter and stay updated on the latest trends.</p>
-                <div class="d-flex justify-content-center">
-                    <div class="input-group" style="max-width: 400px;">
-                        <input type="email" class="form-control bg-transparent text-white border-white" placeholder="your@email.com">
-                        <button class="btn btn-light" type="button">Subscribe</button>
-                    </div>
+        <div class="card-product p-5 text-center no-tilt">
+            <h2 class="fw-bold mb-3">Get 20% Off Your First Order</h2>
+            <p class="text-muted mb-4">Subscribe to our newsletter and stay updated on the latest trends.</p>
+            <div class="d-flex justify-content-center">
+                <div class="input-group" style="max-width: 440px;">
+                    <input type="email" class="form-control" placeholder="Enter your email">
+                    <button class="btn btn-premium" type="button" style="border-radius: 0 8px 8px 0 !important;">Subscribe</button>
                 </div>
             </div>
         </div>

@@ -13,16 +13,16 @@
                     <!-- Items will be injected here by JS -->
                 </div>
             </div>
-            <div class="col-lg-4">
+            <div class="col-lg-4 reveal">
                 <div class="card-product p-4 position-sticky" style="top: 100px;">
                     <h4 class="fw-bold mb-4">Order Summary</h4>
                     <div class="d-flex justify-content-between mb-2">
-                        <span class="text-white">Subtotal</span>
+                        <span>Subtotal</span>
                         <span id="summary-subtotal">$0.00</span>
                     </div>
                     <div class="d-flex justify-content-between mb-2">
-                        <span class="text-white">Shipping</span>
-                        <span class="text-success">FREE</span>
+                        <span>Shipping</span>
+                        <span class="text-success fw-bold">FREE</span>
                     </div>
                     <hr class="my-4" style="border-color: rgba(255,255,255,0.1);">
                     <div class="d-flex justify-content-between mb-4">
@@ -40,16 +40,18 @@
 
 {% block extra_js %}
 <script>
-    function renderCart() {
+    function renderCart(isInitial = false) {
         const cart = JSON.parse(localStorage.getItem('cart') || '[]');
         const container = document.getElementById('cart-items-container');
         
         if (cart.length === 0) {
             container.innerHTML = `
                 <div class="text-center py-5">
-                    <i class="bi bi-cart-x fs-1 text-white mb-3 d-block"></i>
+                    <div class="bg-white p-4 rounded-circle mb-4 d-inline-flex opacity-10">
+                        <i class="bi bi-cart-x fs-1 text-white"></i>
+                    </div>
                     <h3 class="fw-bold">Your cart is empty</h3>
-                    <p class="text-white">Looks like you haven't added anything yet.</p>
+                    <p class="text-white opacity-50">Looks like you haven't added anything yet.</p>
                     <a href="/product" class="btn btn-premium mt-3">Start Shopping</a>
                 </div>
             `;
@@ -61,30 +63,35 @@
         let total = 0;
         
         cart.forEach((item, index) => {
-            const itemTotal = item.price * item.quantity;
+            const price = parseFloat(item.price);
+            const qty = parseInt(item.quantity);
+            const itemTotal = price * qty;
             total += itemTotal;
+            // Add 'visible' class if it's not the first load to prevent flickering
+            const animClass = isInitial ? 'reveal' : 'reveal visible';
+            
             html += `
-                <div class="card-product p-4 mb-3">
+                <div class="card-product p-4 mb-3 ${animClass}">
                     <div class="row align-items-center">
                         <div class="col-md-2 col-4">
-                            <div class="bg-white p-2 rounded-3 text-center">
+                            <div class="bg-white p-2 rounded-3 text-center d-flex align-items-center justify-content-center" style="height: 100px;">
                                 <img src="${item.image}" alt="${item.title}" class="img-fluid" style="max-height: 80px;">
                             </div>
                         </div>
                         <div class="col-md-5 col-8">
-                            <h5 class="mb-1 text-truncate">${item.title}</h5>
-                            <span class="text-white">$${item.price} each</span>
+                            <h5 class="mb-1 text-truncate fw-bold">${item.title}</h5>
+                            <span class="text-white opacity-50 small">$${price.toFixed(2)} each</span>
                         </div>
                         <div class="col-md-3 col-6 mt-md-0 mt-3">
                             <div class="input-group input-group-sm" style="max-width: 120px;">
-                                <button class="btn btn-outline-light" onclick="changeQty(${item.id}, -1)">-</button>
-                                <input type="text" class="form-control bg-transparent text-white text-center border-light" value="${item.quantity}" readonly>
-                                <button class="btn btn-outline-light" onclick="changeQty(${item.id}, 1)">+</button>
+                                <button class="btn btn-outline-light" onclick="changeQty('${item.id}', -1)">-</button>
+                                <input type="text" class="form-control text-center bg-transparent text-white border-light" value="${qty}" readonly>
+                                <button class="btn btn-outline-light" onclick="changeQty('${item.id}', 1)">+</button>
                             </div>
                         </div>
                         <div class="col-md-2 col-6 mt-md-0 mt-3 text-end">
                             <div class="fw-bold mb-1">$${itemTotal.toFixed(2)}</div>
-                            <button class="btn btn-link text-danger p-0" onclick="removeItem(${item.id})"><i class="bi bi-trash"></i></button>
+                            <button class="btn btn-link text-danger p-0" onclick="removeItem('${item.id}')"><i class="bi bi-trash"></i></button>
                         </div>
                     </div>
                 </div>
@@ -93,27 +100,28 @@
         
         container.innerHTML = html;
         updateSummary(total);
+        if (isInitial && typeof initReveal === 'function') initReveal();
     }
 
     function changeQty(id, delta) {
         let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        const item = cart.find(i => i.id === id);
+        const item = cart.find(i => String(i.id) == String(id));
         if (item) {
-            item.quantity += delta;
+            item.quantity = parseInt(item.quantity) + delta;
             if (item.quantity <= 0) {
-                cart = cart.filter(i => i.id !== id);
+                cart = cart.filter(i => String(i.id) != String(id));
             }
             localStorage.setItem('cart', JSON.stringify(cart));
-            renderCart();
+            renderCart(false); // Not initial, so no flickering
             updateCartUI();
         }
     }
 
     function removeItem(id) {
         let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-        cart = cart.filter(i => i.id !== id);
+        cart = cart.filter(i => String(i.id) != String(id));
         localStorage.setItem('cart', JSON.stringify(cart));
-        renderCart();
+        renderCart(false);
         updateCartUI();
     }
 
@@ -122,6 +130,8 @@
         document.getElementById('summary-total').textContent = '$' + total.toFixed(2);
     }
 
-    document.addEventListener('DOMContentLoaded', renderCart);
+    document.addEventListener('DOMContentLoaded', () => {
+        renderCart(true); // Initial load with animations
+    });
 </script>
 {% endblock %}

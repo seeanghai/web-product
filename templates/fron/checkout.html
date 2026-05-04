@@ -39,9 +39,9 @@
 
                         <h3 class="fw-bold mt-5 mb-4">Payment Method</h3>
                         <div class="row g-3">
-                            <div class="col-12">
-                                <div class="form-check card-product p-3 bg-transparent border-primary mb-3">
-                                    <input class="form-check-input ms-0" type="radio" name="payment" id="card" checked>
+                            <div class="col-md-6">
+                                <div class="form-check card-product p-3 bg-transparent border-primary mb-3 h-100">
+                                    <input class="form-check-input ms-0" type="radio" name="payment" id="card" checked onchange="togglePayment('card')">
                                     <label class="form-check-label ms-4 d-flex justify-content-between w-100" for="card">
                                         <span>Credit Card</span>
                                         <div class="fs-4">
@@ -49,23 +49,40 @@
                                         </div>
                                     </label>
                                 </div>
-                                <div class="form-check card-product p-3 bg-transparent border-secondary opacity-50">
-                                    <input class="form-check-input ms-0" type="radio" name="payment" id="paypal" disabled>
-                                    <label class="form-check-label ms-4 d-flex justify-content-between w-100" for="paypal">
-                                        <span>PayPal</span>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check card-product p-3 bg-transparent border-secondary mb-3 h-100">
+                                    <input class="form-check-input ms-0" type="radio" name="payment" id="qr" onchange="togglePayment('qr')">
+                                    <label class="form-check-label ms-4 d-flex justify-content-between w-100" for="qr">
+                                        <span>QR Pay</span>
                                         <div class="fs-4">
-                                            <i class="bi bi-paypal"></i>
+                                            <i class="bi bi-qr-code-scan"></i>
                                         </div>
                                     </label>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- Card Fields -->
+                        <div id="card-fields" class="mt-4">
                             <div class="col-12">
                                 <label class="form-label text-white">Card Number</label>
                                 <input type="text" class="form-control bg-transparent text-white border-secondary" placeholder="0000 0000 0000 0000">
                             </div>
+                            <button type="submit" class="btn btn-premium w-100 py-3 mt-5 fs-5">Complete Purchase</button>
                         </div>
 
-                        <button type="submit" class="btn btn-premium w-100 py-3 mt-5 fs-5">Complete Purchase</button>
+                        <!-- QR Field -->
+                        <div id="qr-fields" class="mt-4 d-none text-center">
+                            <div class="card-product p-4 bg-white text-dark d-inline-block rounded-4">
+                                <div id="qr-status" class="mb-3 small fw-bold text-primary">SCAN TO PAY</div>
+                                <img id="qr-img" src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=STELLAR_PAYMENT" alt="QR Code" class="img-fluid mb-3" style="width: 200px;">
+                                <div class="d-flex align-items-center justify-content-center">
+                                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+                                    <span class="small text-muted">Waiting for payment...</span>
+                                </div>
+                            </div>
+                        </div>
                     </form>
                 </div>
             </div>
@@ -92,14 +109,14 @@
 </section>
 
 <!-- Success Modal -->
-<div class="modal fade" id="successModal" tabindex="-1">
+<div class="modal fade" id="successModal" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content bg-dark border-primary text-center p-5 rounded-5">
             <div class="mb-4">
                 <i class="bi bi-check-circle-fill text-primary" style="font-size: 5rem;"></i>
             </div>
-            <h2 class="fw-bold mb-3">Order Placed!</h2>
-            <p class="text-white mb-4">Thank you for your purchase. We've sent a confirmation email to your inbox.</p>
+            <h2 class="fw-bold mb-3">Payment Successful!</h2>
+            <p class="text-white mb-4">Your order has been placed successfully. We'll start preparing it right away!</p>
             <a href="/" class="btn btn-premium w-100 py-3">Return to Home</a>
         </div>
     </div>
@@ -108,6 +125,8 @@
 
 {% block extra_js %}
 <script>
+    let qrTimer;
+
     function renderCheckout() {
         const cart = JSON.parse(localStorage.getItem('cart') || '[]');
         const container = document.getElementById('checkout-items');
@@ -119,8 +138,8 @@
             html += `
                 <div class="d-flex justify-content-between align-items-center mb-3">
                     <div class="d-flex align-items-center">
-                        <div class="bg-white p-1 rounded-2 me-3" style="width: 40px;">
-                            <img src="${item.image}" alt="${item.title}" class="img-fluid">
+                        <div class="bg-white p-1 rounded-2 me-3" style="width: 40px; height: 40px; display: flex; align-items: center;">
+                            <img src="${item.image}" alt="${item.title}" class="img-fluid" style="max-height: 100%;">
                         </div>
                         <span class="text-white small text-truncate" style="max-width: 150px;">${item.title} x ${item.quantity}</span>
                     </div>
@@ -130,16 +149,49 @@
         });
         
         container.innerHTML = html;
-        document.getElementById('checkout-subtotal').textContent = '$' + total.toFixed(2);
-        document.getElementById('checkout-total').textContent = '$' + total.toFixed(2);
+        const totalStr = '$' + total.toFixed(2);
+        document.getElementById('checkout-subtotal').textContent = totalStr;
+        document.getElementById('checkout-total').textContent = totalStr;
+
+        // Update QR code data with the actual total
+        document.getElementById('qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=STELLAR_PAY_${total}`;
     }
 
-    document.getElementById('checkout-form').addEventListener('submit', (e) => {
-        e.preventDefault();
+    function togglePayment(method) {
+        const cardFields = document.getElementById('card-fields');
+        const qrFields = document.getElementById('qr-fields');
+        
+        if (method === 'card') {
+            cardFields.classList.remove('d-none');
+            qrFields.classList.add('d-none');
+            clearTimeout(qrTimer);
+        } else {
+            cardFields.classList.add('d-none');
+            qrFields.classList.remove('d-none');
+            
+            // Start 5s simulation
+            qrTimer = setTimeout(() => {
+                document.getElementById('qr-status').textContent = 'VERIFYING...';
+                document.getElementById('qr-status').classList.remove('text-primary');
+                document.getElementById('qr-status').classList.add('text-success');
+                
+                setTimeout(() => {
+                    handleSuccess();
+                }, 1500);
+            }, 3500); // 3.5s + 1.5s = 5s total
+        }
+    }
+
+    function handleSuccess() {
         const modal = new bootstrap.Modal(document.getElementById('successModal'));
         modal.show();
         localStorage.removeItem('cart');
         updateCartUI();
+    }
+
+    document.getElementById('checkout-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        handleSuccess();
     });
 
     document.addEventListener('DOMContentLoaded', renderCheckout);
